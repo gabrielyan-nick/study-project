@@ -42,7 +42,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   //timer
 
-  const deadline = "2022-10-29";
+  const deadline = "2022-9-29";
 
   function getTimeRemaining(endtime) {
     // определяем оставшееся время, результат в обьект
@@ -243,21 +243,48 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const forms = document.querySelectorAll('form');
 
+  const message = {
+    loading: 'Загрузка',
+    success: 'Спасибо. Скоро мы с вами свяжемся.',
+    failure: 'Что-то пошло не так...'
+  };
+
+  forms.forEach(i => {
+    postData(i);
+  });
+
   function postData(form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const statusMessage = document.createElement('div');
+      statusMessage.classList.add('status');
+      statusMessage.textContent = message.loading;  
+      form.append(statusMessage);
+
       const req = new XMLHttpRequest();
       req.open('POST', 'server.php');
-      req.setRequestHeader('Content-type', 'multipart/form-data');
+      req.setRequestHeader('Content-type', 'application/json');
 
       const formData = new FormData(form);
 
-      req.send(formData);
+      const obj = {};
+      formData.forEach((value, key) => {
+        obj[key] = value;
+      });
+      
+      req.send(JSON.stringify(obj));
 
       req.addEventListener('load', () => {
         if (req.status === 200) {
-          console.log(request.response);
+          console.log(req.response);
+          statusMessage.textContent = message.success;  
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 3000);
+        } else {
+          statusMessage.textContent = message.failure;  
         }
       });
 
@@ -265,9 +292,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  forms.forEach(i => {
-    postData(i);
-  });
+ 
 
   
   
