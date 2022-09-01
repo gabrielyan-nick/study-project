@@ -262,32 +262,49 @@ window.addEventListener("DOMContentLoaded", () => {
       statusMessage.classList.add('loading-img');
       form.insertAdjacentElement('afterend', statusMessage);
 
-      const request = new XMLHttpRequest();
-      request.open("POST", "server.php");
-      request.setRequestHeader("Content-type", "application/json");
+      // const request = new XMLHttpRequest();
+      // request.open("POST", "server.php");
+      // request.setRequestHeader("Content-type", "application/json");
 
       const formData = new FormData(form);
 
-      let obj = {};
+      const obj = {};
 
       formData.forEach((value, key) => {
         obj[key] = value;
       });
 
-      request.send(JSON.stringify(obj));
-
-      request.addEventListener("load", () => {
-        if (request.status === 200) {
-          console.log(request.response);
-         showThanksModal(message.success);
-         statusMessage.remove();
-         form.reset();
-        } else {
-          showThanksModal(message.failure);
-          statusMessage.remove();
-          form.reset();
-        }
+      fetch('server.php', {
+        method: 'POST',
+        body: JSON.stringify(obj) ,
+        headers: {"Content-type": "application/json"}
+      })
+      .then(data => data.text())
+      .then(data => {
+        console.log(data);
+        showThanksModal(message.success);
+      }).catch((data) => {
+        console.log(data);
+        showThanksModal(message.failure);
+      }).finally(() => {
+        statusMessage.remove();
+        form.reset();
       });
+      
+      // request.send(JSON.stringify(obj));
+
+      // request.addEventListener("load", () => {
+      //   if (request.status === 200) {
+      //     console.log(request.response);
+      //    showThanksModal(message.success);
+      //    statusMessage.remove();
+      //    form.reset();
+      //   } else {
+      //     showThanksModal(message.failure);
+      //     statusMessage.remove();
+      //     form.reset();
+      //   }
+      // });
     });
   }
 
@@ -315,13 +332,10 @@ window.addEventListener("DOMContentLoaded", () => {
       modalDialog.classList.add("show");
       closeModal();
     }, 3000);
-
-    
-
   }
 
-  
 
+  
 
 
 
