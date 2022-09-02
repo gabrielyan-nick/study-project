@@ -177,7 +177,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const element = document.createElement("div");
 
       if (this.classes.length > 0) {
-        this.classes.forEach((className) => {
+        this.classes.forEach(className => {
           element.classList.add(className);
         });
       } else {
@@ -199,45 +199,58 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  new MenuCard(
-    "img/tabs/post.jpg",
-    "post",
-    'Меню "Постное"',
-    "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
-    11,
-    ".menu__field .container",
-    "menu__item"
-  ).render();
+  const getResourse = async url => {    // Функция для получения данных для карточек товара.
+    const res = await fetch(url);
+    
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status ${res.status}`);
+    }
 
-  new MenuCard(
-    "img/tabs/elite.jpg",
-    "elite",
-    "Меню “Премиум”",
-    "В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
-    15,
-    ".menu__field .container",
-    "menu__item"
-  ).render();
+    return await res.json();
+  };
 
-  new MenuCard(
-    "img/tabs/vegy.jpg",
-    "vegy",
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    10,
-    ".menu__field .container",
-    "menu__item"
-  ).render();
+  // getResourse('http://localhost:3000/menu')
+  // .then(data => createCard(data));
 
-  const cannaMenu = new MenuCard(
-    "img/tabs/canna.jpg",
-    "canna",
-    'Меню "Канна"',
-    "Весело и вкусно",
-    25,
-    ".menu__field .container"
-  );
-  cannaMenu.render();
+  //   function createCard(data) {
+  //     data.forEach(({img, altimg, title, descr, price}) => {
+
+  //     const element = document.createElement("div");
+
+  //     element.classList.add("menu__item");
+  
+  //     element.innerHTML = `<img src="${img}" alt="${altimg}" />
+  //       <h3 class="menu__item-subtitle">${title}</h3>
+  //       <div class="menu__item-descr">
+  //         ${descr}
+  //       </div>
+  //       <div class="menu__item-divider"></div>
+  //       <div class="menu__item-price">
+  //         <div class="menu__item-cost">Цена:</div>
+  //         <div class="menu__item-total"><span>${price * 35}</span> грн/день</div>
+  //       </div>`;
+  
+  //       document.querySelector('.menu__field .container').append(element);
+  //   });
+  // }
+
+  getResourse('http://localhost:3000/menu')  // Формируем верстку.
+  .then(data => {
+    data.forEach(({img, altimg, title, descr, price}) => {
+      new MenuCard(img, altimg, title, descr, price, ".menu__field .container").render();
+    });
+  });
+
+
+  // const cannaMenu = new MenuCard(
+  //   "img/tabs/canna.jpg",
+  //   "canna",
+  //   'Меню "Канна"',
+  //   "Весело и вкусно",
+  //   25,
+  //   ".menu__field .container"
+  // );
+  // cannaMenu.render();
 
   //Forms
 
@@ -250,10 +263,21 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   forms.forEach((i) => {
-    postData(i);
+    bindpostData(i);
   });
 
-  function postData(form) {
+  const postData = async (url, data) => {    // Функция для отправки данных.
+    const res = await fetch(url, {
+      method: 'POST',
+      body: data,
+      headers: {"Content-type": "application/json"}
+    });
+
+    return await res.json();
+  };
+
+
+  function bindpostData(form) {     // Функция для обработки данных после отправки.
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -262,24 +286,12 @@ window.addEventListener("DOMContentLoaded", () => {
       statusMessage.classList.add('loading-img');
       form.insertAdjacentElement('afterend', statusMessage);
 
-      // const request = new XMLHttpRequest();
-      // request.open("POST", "server.php");
-      // request.setRequestHeader("Content-type", "application/json");
-
       const formData = new FormData(form);
 
-      const obj = {};
+      const json = JSON.stringify(Object.fromEntries(formData.entries())); 
+      //            в json            в обьект          в массив массивов
 
-      formData.forEach((value, key) => {
-        obj[key] = value;
-      });
-
-      fetch('server.php', {
-        method: 'POST',
-        body: JSON.stringify(obj) ,
-        headers: {"Content-type": "application/json"}
-      })
-      .then(data => data.text())
+     postData('http://localhost:3000/requests', json)
       .then(data => {
         console.log(data);
         showThanksModal(message.success);
@@ -291,24 +303,10 @@ window.addEventListener("DOMContentLoaded", () => {
         form.reset();
       });
       
-      // request.send(JSON.stringify(obj));
-
-      // request.addEventListener("load", () => {
-      //   if (request.status === 200) {
-      //     console.log(request.response);
-      //    showThanksModal(message.success);
-      //    statusMessage.remove();
-      //    form.reset();
-      //   } else {
-      //     showThanksModal(message.failure);
-      //     statusMessage.remove();
-      //     form.reset();
-      //   }
-      // });
     });
   }
 
-  function showThanksModal(message) {
+  function showThanksModal(message) {     // Функция для показа резузьтата пользователю после отправки формы.
     const modalDialog = document.querySelector(".modal__dialog");
 
     modalDialog.classList.add("hide");
@@ -334,7 +332,9 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-
+  fetch('http://localhost:3000/menu')   // Запуск json-server.
+  .then(data => data.json());
+  // .then(res => console.log(res));
   
 
 
