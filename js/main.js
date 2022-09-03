@@ -199,47 +199,28 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const getResourse = async url => {    // Функция для получения данных для карточек товара.
-    const res = await fetch(url);
+  // const getResourse = async url => {    // Функция для получения данных для карточек товара.
+  //   const res = await fetch(url);
     
-    if (!res.ok) {
-      throw new Error(`Could not fetch ${url}, status ${res.status}`);
-    }
+  //   if (!res.ok) {
+  //     throw new Error(`Could not fetch ${url}, status ${res.status}`);
+  //   }
+  //   return await res.json();
+  // };
 
-    return await res.json();
-  };
-
-  // getResourse('http://localhost:3000/menu')
-  // .then(data => createCard(data));
-
-  //   function createCard(data) {
-  //     data.forEach(({img, altimg, title, descr, price}) => {
-
-  //     const element = document.createElement("div");
-
-  //     element.classList.add("menu__item");
-  
-  //     element.innerHTML = `<img src="${img}" alt="${altimg}" />
-  //       <h3 class="menu__item-subtitle">${title}</h3>
-  //       <div class="menu__item-descr">
-  //         ${descr}
-  //       </div>
-  //       <div class="menu__item-divider"></div>
-  //       <div class="menu__item-price">
-  //         <div class="menu__item-cost">Цена:</div>
-  //         <div class="menu__item-total"><span>${price * 35}</span> грн/день</div>
-  //       </div>`;
-  
-  //       document.querySelector('.menu__field .container').append(element);
+  // getResourse('http://localhost:3000/menu')  // Формируем верстку.
+  // .then(data => {
+  //   data.forEach(({img, altimg, title, descr, price}) => {
+  //     new MenuCard(img, altimg, title, descr, price, ".menu__field .container").render();
   //   });
-  // }
+  // });
 
-  getResourse('http://localhost:3000/menu')  // Формируем верстку.
+  axios.get('http://localhost:3000/menu')  // Получение данных для карточек товара с помощью axios.
   .then(data => {
-    data.forEach(({img, altimg, title, descr, price}) => {
-      new MenuCard(img, altimg, title, descr, price, ".menu__field .container").render();
+      data.data.forEach(({img, altimg, title, descr, price}) => {
+        new MenuCard(img, altimg, title, descr, price, ".menu__field .container").render();
+      });
     });
-  });
 
 
   // const cannaMenu = new MenuCard(
@@ -266,18 +247,18 @@ window.addEventListener("DOMContentLoaded", () => {
     bindpostData(i);
   });
 
-  const postData = async (url, data) => {    // Функция для отправки данных.
-    const res = await fetch(url, {
-      method: 'POST',
-      body: data,
-      headers: {"Content-type": "application/json"}
-    });
+  // const postData = async (url, data) => {    // Функция для отправки данных.
+  //   const res = await fetch(url, {
+  //     method: 'POST',
+  //     body: data,
+  //     headers: {"Content-type": "application/json"}
+  //   });
 
-    return await res.json();
-  };
+  //   return await res.json();
+  // };
 
 
-  function bindpostData(form) {     // Функция для обработки данных после отправки.
+  function bindpostData(form) {     // Функция для отправки и обработки данных.
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -288,10 +269,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
       const formData = new FormData(form);
 
-      const json = JSON.stringify(Object.fromEntries(formData.entries())); 
+      // const json = JSON.stringify(Object.fromEntries(formData.entries())); 
       //            в json            в обьект          в массив массивов
 
-     postData('http://localhost:3000/requests', json)
+     axios.post('http://localhost:3000/requests', Object.fromEntries(formData.entries()))  // Отправка данных с помощью axios.
       .then(data => {
         console.log(data);
         showThanksModal(message.success);
@@ -302,7 +283,6 @@ window.addEventListener("DOMContentLoaded", () => {
         statusMessage.remove();
         form.reset();
       });
-      
     });
   }
 
@@ -332,11 +312,57 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  fetch('http://localhost:3000/menu')   // Запуск json-server.
-  .then(data => data.json());
-  // .then(res => console.log(res));
-  
+  // Slider
 
+  const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        current = document.querySelector('#current'),
+        total = document.querySelector('#total');
+  let slideIndex = 1;
+      
+  showSlides(slideIndex);
+
+  if (slides.length < 10) {
+    total.textContent = `0${slides.length}`;
+  } else {
+    total.textContent = slides.length;
+  }
+
+function showSlides(n) {
+  if (n > slides.length) {
+    slideIndex = 1;
+  }
+  if (n < 1) {
+    slideIndex = slides.length;
+  }
+
+  slides.forEach(item => {
+    item.classList.add('hide');
+    item.classList.remove('show');
+  });
+
+  slides[slideIndex - 1].classList.add('show');
+  slides[slideIndex - 1].classList.remove('hide');
+
+  if (slides.length < 10) {
+    current.textContent = `0${slideIndex}`;
+  } else {
+    current.textContent = slideIndex;
+  }
+}
+  
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+prev.addEventListener('click', () => {
+  plusSlides(-1);
+});
+
+next.addEventListener('click', () => {
+  plusSlides(1);
+});
 
 
 
