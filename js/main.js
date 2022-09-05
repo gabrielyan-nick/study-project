@@ -126,10 +126,8 @@ window.addEventListener("DOMContentLoaded", () => {
     item.addEventListener("click", openModal);
   });
 
- 
-
   modal.addEventListener("click", (e) => {
-    if (e.target === modal || e.target.getAttribute('data-close') == '' ) {
+    if (e.target === modal || e.target.getAttribute("data-close") == "") {
       closeModal();
     }
   });
@@ -177,7 +175,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const element = document.createElement("div");
 
       if (this.classes.length > 0) {
-        this.classes.forEach(className => {
+        this.classes.forEach((className) => {
           element.classList.add(className);
         });
       } else {
@@ -201,7 +199,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // const getResourse = async url => {    // Функция для получения данных для карточек товара.
   //   const res = await fetch(url);
-    
+
   //   if (!res.ok) {
   //     throw new Error(`Could not fetch ${url}, status ${res.status}`);
   //   }
@@ -215,13 +213,20 @@ window.addEventListener("DOMContentLoaded", () => {
   //   });
   // });
 
-  axios.get('http://localhost:3000/menu')  // Получение данных для карточек товара с помощью axios.
-  .then(data => {
-      data.data.forEach(({img, altimg, title, descr, price}) => {
-        new MenuCard(img, altimg, title, descr, price, ".menu__field .container").render();
+  axios
+    .get("http://localhost:3000/menu") // Получение данных для карточек товара с помощью axios.
+    .then((data) => {
+      data.data.forEach(({ img, altimg, title, descr, price }) => {
+        new MenuCard(
+          img,
+          altimg,
+          title,
+          descr,
+          price,
+          ".menu__field .container"
+        ).render();
       });
     });
-
 
   // const cannaMenu = new MenuCard(
   //   "img/tabs/canna.jpg",
@@ -257,36 +262,43 @@ window.addEventListener("DOMContentLoaded", () => {
   //   return await res.json();
   // };
 
-
-  function bindpostData(form) {     // Функция для отправки и обработки данных.
+  function bindpostData(form) {
+    // Функция для отправки и обработки данных.
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
       const statusMessage = document.createElement("img");
       statusMessage.src = message.loading;
-      statusMessage.classList.add('loading-img');
-      form.insertAdjacentElement('afterend', statusMessage);
+      statusMessage.classList.add("loading-img");
+      form.insertAdjacentElement("afterend", statusMessage);
 
       const formData = new FormData(form);
 
-      // const json = JSON.stringify(Object.fromEntries(formData.entries())); 
+      // const json = JSON.stringify(Object.fromEntries(formData.entries()));
       //            в json            в обьект          в массив массивов
 
-     axios.post('http://localhost:3000/requests', Object.fromEntries(formData.entries()))  // Отправка данных с помощью axios.
-      .then(data => {
-        console.log(data);
-        showThanksModal(message.success);
-      }).catch((data) => {
-        console.log(data);
-        showThanksModal(message.failure);
-      }).finally(() => {
-        statusMessage.remove();
-        form.reset();
-      });
+      axios
+        .post(
+          "http://localhost:3000/requests",
+          Object.fromEntries(formData.entries())
+        ) // Отправка данных с помощью axios.
+        .then((data) => {
+          console.log(data);
+          showThanksModal(message.success);
+        })
+        .catch((data) => {
+          console.log(data);
+          showThanksModal(message.failure);
+        })
+        .finally(() => {
+          statusMessage.remove();
+          form.reset();
+        });
     });
   }
 
-  function showThanksModal(message) {     // Функция для показа резузьтата пользователю после отправки формы.
+  function showThanksModal(message) {
+    // Функция для показа резузьтата пользователю после отправки формы.
     const modalDialog = document.querySelector(".modal__dialog");
 
     modalDialog.classList.add("hide");
@@ -314,122 +326,200 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Slider
 
-  const slides = document.querySelectorAll('.offer__slide'),
-        prev = document.querySelector('.offer__slider-prev'),
-        next = document.querySelector('.offer__slider-next'),
-        current = document.querySelector('#current'),
-        total = document.querySelector('#total'),
-        sliderField = document.querySelector('.offer__slider-inner'),
-        sliderWrapper = document.querySelector('.offer__slider-wrapper'),
-        width = window.getComputedStyle(sliderWrapper).width;
+  const slides = document.querySelectorAll(".offer__slide"),
+    prev = document.querySelector(".offer__slider-prev"),
+    next = document.querySelector(".offer__slider-next"),
+    current = document.querySelector("#current"),
+    total = document.querySelector("#total"),
+    sliderField = document.querySelector(".offer__slider-inner"),
+    sliderWrapper = document.querySelector(".offer__slider-wrapper"),
+    width = window.getComputedStyle(sliderWrapper).width,
+    slider = document.querySelector(".offer__slider");
 
   let slideIndex = 1;
   let offset = 0;
 
-  if (slides.length < 10) {    // Инициализация счетчика.
-        total.textContent = `0${slides.length}`;
-        current.textContent = `0${slideIndex}`;
-      } else {
-        total.textContent = slides.length;
-        current.textContent = slideIndex;
-      }
+  if (slides.length < 10) {
+    // Инициализация счетчика.
+    total.textContent = `0${slides.length}`;
+    current.textContent = `0${slideIndex}`;
+  } else {
+    total.textContent = slides.length;
+    current.textContent = slideIndex;
+  }
 
-      
-  sliderField.style.width = 100 * slides.length + '%';
-  sliderField.style.display = 'flex';
-  sliderField.style.transition = 'all 0.5s';
-  sliderWrapper.style.overflow = 'hidden';
-  slides.forEach(slide => {
+  sliderField.style.width = 100 * slides.length + "%";
+  sliderField.style.display = "flex";
+  sliderField.style.transition = "all 0.5s";
+  sliderWrapper.style.overflow = "hidden";
+  slides.forEach((slide) => {
     slide.style.width = width;
   });
-  
-next.addEventListener('click', () => {
-  if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {  // Круговая прокрутка.
+
+  slider.style.position = "relative";
+
+  const indicators = document.createElement("ul"), // Обертка для точек.
+    dots = [];
+
+  indicators.classList.add("carousel-indicators");
+  slider.append(indicators);
+
+  for (let i = 0; i < slides.length; i++) {
+    // Создаем точки.
+    const dot = document.createElement("li");
+
+    dot.classList.add("dot");
+    dot.setAttribute("data-slide-to", i + 1);
+    if (i == 0) {
+      dot.style.opacity = 1;
+    }
+    indicators.append(dot);
+    dots.push(dot);
+  }
+
+  function addZero() {
+    // Добавляет ноль в счетчике.
+    if (slides.length < 10) {
+      current.textContent = `0${slideIndex}`;
+    } else {
+      current.textContent = slideIndex;
+    }
+  }
+
+  function dotActive() {
+    dots.forEach((dot) => (dot.style.opacity = ".5"));
+    dots[slideIndex - 1].style.opacity = 1;
+  }
+
+  function getNum(str) {
+    return +str.replace(/\D/g, "");
+  }
+
+  next.addEventListener("click", () => {
+    if (offset == getNum(width) * (slides.length - 1)) {
+      // Круговая прокрутка.
       offset = 0;
-  } else {
-    offset += +width.slice(0, width.length - 2);
+    } else {
+      offset += getNum(width);
+    }
+
+    sliderField.style.transform = `translateX(-${offset}px)`;
+
+    if (slideIndex == slides.length) {
+      // Круговая прокрутка счетчика.
+      slideIndex = 1;
+    } else {
+      slideIndex++;
+    }
+
+    addZero();
+    dotActive();
+  });
+
+  prev.addEventListener("click", () => {
+    if (offset == 0) {
+      offset = getNum(width) * (slides.length - 1);
+    } else {
+      offset -= getNum(width);
+    }
+
+    sliderField.style.transform = `translateX(-${offset}px)`;
+
+    if (slideIndex == 1) {
+      slideIndex = slides.length;
+    } else {
+      slideIndex--;
+    }
+
+    addZero();
+    dotActive();
+  });
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", (e) => {
+      const slideTo = e.target.getAttribute("data-slide-to");
+
+      slideIndex = slideTo;
+      offset = getNum(width) * (slideTo - 1);
+
+      sliderField.style.transform = `translateX(-${offset}px)`;
+
+      addZero();
+      dotActive();
+    });
+  });
+
+// Calculator
+
+const result = document.querySelector('.calculating__result span');
+let sex = 'female',
+    height, weight, age,
+    ratio = 1.375;
+
+function calcTotal() {                          // Считает результат по формуле.
+  if (!sex || !height || !weight || !age || !ratio) {
+    result.textContent = '____';
+    return;
   }
 
-  sliderField.style.transform = `translateX(-${offset}px)`;
-
-  if (slideIndex == slides.length) {   // Круговая прокрутка счетчика.
-    slideIndex = 1;
+  if (sex === 'female') {
+    result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
   } else {
-    slideIndex++;
+    result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
   }
-
-  if (slides.length < 10) {    // Изменение счетчика.
-    current.textContent = `0${slideIndex}`;
-  } else {
-    current.textContent = slideIndex;
-  }
-
-});
-
-prev.addEventListener('click', () => {
-  if (offset == 0) {
-    offset = +width.slice(0, width.length - 2) * (slides.length - 1);
-} else {
-  offset -= +width.slice(0, width.length - 2);
 }
 
-  sliderField.style.transform = `translateX(-${offset}px)`;
+calcTotal();
+
+function getStaticInfo(parent, activeClass) {        // Собирает выбранную инфу.
+  const elements = document.querySelectorAll(`${parent} div`);
+
+  elements.forEach(elem => {
+    elem.addEventListener('click', (e) => {
+      if (e.target.getAttribute('data-ratio')) {
+        ratio = +e.target.getAttribute('data-ratio');
+      } else {
+        sex = e.target.getAttribute('id');
+      }
+
+      elements.forEach(item => {
+        item.classList.remove(activeClass);
+      });
   
-  if (slideIndex == 1) {
-    slideIndex = slides.length;
-  } else {
-    slideIndex--;
-  }
-
-  if (slides.length < 10) {
-    current.textContent = `0${slideIndex}`;
-  } else {
-    current.textContent = slideIndex;
-  }
-});
-
-//   showSlides(slideIndex);
-
-//   if (slides.length < 10) {
-//     total.textContent = `0${slides.length}`;
-//   } else {
-//     total.textContent = slides.length;
-//   }
-
-// function showSlides(n) {
-//   if (n > slides.length) {
-//     slideIndex = 1;
-//   }
-//   if (n < 1) {
-//     slideIndex = slides.length;
-//   }
-
-//   slides.forEach(item => {
-//     item.classList.add('hide');
-//     item.classList.remove('show');
-//   });
-
-//   slides[slideIndex - 1].classList.add('show');
-//   slides[slideIndex - 1].classList.remove('hide');
-
-//   if (slides.length < 10) {
-//     current.textContent = `0${slideIndex}`;
-//   } else {
-//     current.textContent = slideIndex;
-//   }
-// }
+      e.target.classList.add(activeClass);
   
-// function plusSlides(n) {
-//   showSlides(slideIndex += n);
-// }
+      calcTotal();
+    });
+  });
+}
 
-// prev.addEventListener('click', () => {
-//   plusSlides(-1);
-// });
+getStaticInfo('#gender', 'calculating__choose-item_active');
+getStaticInfo('.calculating__choose_big', 'calculating__choose-item_active');
 
-// next.addEventListener('click', () => {
-//   plusSlides(1);
-// });
+function getInfo(selector) {                         // Собирает введенную инфу.
+  const input = document.querySelector(selector);
+
+  input.addEventListener('input', () => {
+    switch(input.getAttribute('id')) {
+    case 'height':
+      height = +input.value;
+      break;
+    case 'weight':
+      weight = +input.value;
+      break;
+    case 'age':
+      age = +input.value;
+      break;
+    }
+
+    calcTotal();
+  });
+}
+
+getInfo('#height');
+getInfo('#weight');
+getInfo('#age');
+
 
 
 
