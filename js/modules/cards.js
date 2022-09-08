@@ -1,3 +1,5 @@
+import {getResource} from '../services/services';
+
 function cards() {
   // Используем классы для карточек.
 
@@ -44,20 +46,34 @@ function cards() {
     }
   }
 
-  axios
-    .get("http://localhost:3000/menu") // Получение данных для карточек товара с помощью axios.
-    .then((data) => {
-      data.data.forEach(({ img, altimg, title, descr, price }) => {
-        new MenuCard(
-          img,
-          altimg,
-          title,
-          descr,
-          price,
-          ".menu__field .container"
-        ).render();
+  getResource("http://localhost:3000/menu")
+  .then((data) => {
+        data.forEach(({ img, altimg, title, descr, price }) => {
+          new MenuCard(
+            img,
+            altimg,
+            title,
+            descr,
+            price,
+            ".menu__field .container"
+          ).render();
+        });
       });
-    });
+
+  // axios      // Получение данных для карточек товара с помощью axios.
+  //   .get("http://localhost:3000/menu") 
+  //   .then((data) => {
+  //     data.data.forEach(({ img, altimg, title, descr, price }) => {
+  //       new MenuCard(
+  //         img,
+  //         altimg,
+  //         title,
+  //         descr,
+  //         price,
+  //         ".menu__field .container"
+  //       ).render();
+  //     });
+  //   });
 }
 
-module.exports = cards;
+export default cards;

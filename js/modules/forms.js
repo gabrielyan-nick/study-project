@@ -1,7 +1,10 @@
-function forms() {
+import {openModal, closeModal} from './modal';
+import {postData} from '../services/services';
+
+function forms(modalTimer, selector) {
   //Forms
 
-  const forms = document.querySelectorAll("form");
+  const forms = document.querySelectorAll(selector);
 
   const message = {
     loading: "img/form/spinner.svg",
@@ -12,16 +15,6 @@ function forms() {
   forms.forEach((i) => {
     bindpostData(i);
   });
-
-  // const postData = async (url, data) => {    // Функция для отправки данных.
-  //   const res = await fetch(url, {
-  //     method: 'POST',
-  //     body: data,
-  //     headers: {"Content-type": "application/json"}
-  //   });
-
-  //   return await res.json();
-  // };
 
   function bindpostData(form) {
     // Функция для отправки и обработки данных.
@@ -35,26 +28,40 @@ function forms() {
 
       const formData = new FormData(form);
 
-      // const json = JSON.stringify(Object.fromEntries(formData.entries()));
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
       //            в json            в обьект          в массив массивов
 
-      axios
-        .post(
-          "http://localhost:3000/requests",
-          Object.fromEntries(formData.entries())
-        ) // Отправка данных с помощью axios.
-        .then((data) => {
-          console.log(data);
-          showThanksModal(message.success);
-        })
-        .catch((data) => {
-          console.log(data);
-          showThanksModal(message.failure);
-        })
-        .finally(() => {
-          statusMessage.remove();
-          form.reset();
-        });
+      postData("http://localhost:3000/requests", json)
+      .then((data) => {
+            console.log(data);
+            showThanksModal(message.success);
+          })
+          .catch((data) => {
+            console.log(data);
+            showThanksModal(message.failure);
+          })
+          .finally(() => {
+            statusMessage.remove();
+            form.reset();
+          });
+
+      // axios                            Отправка данных с помощью axios.
+      //   .post(
+      //     "http://localhost:3000/requests",
+      //     Object.fromEntries(formData.entries())
+      //   ) // Отправка данных с помощью axios.
+      //   .then((data) => {
+      //     console.log(data);
+      //     showThanksModal(message.success);
+      //   })
+      //   .catch((data) => {
+      //     console.log(data);
+      //     showThanksModal(message.failure);
+      //   })
+      //   .finally(() => {
+      //     statusMessage.remove();
+      //     form.reset();
+      //   });
     });
   }
 
@@ -63,7 +70,7 @@ function forms() {
     const modalDialog = document.querySelector(".modal__dialog");
 
     modalDialog.classList.add("hide");
-    openModal();
+    openModal(".modal", modalTimer);
 
     const thanksModal = document.createElement("div");
     thanksModal.classList.add("modal__dialog");
@@ -75,15 +82,15 @@ function forms() {
         </div>
     `;
 
-    modal.append(thanksModal);
+    document.querySelector('.modal').append(thanksModal);
 
     setTimeout(() => {
       thanksModal.remove();
       modalDialog.classList.remove("hide");
       modalDialog.classList.add("show");
-      closeModal();
+      closeModal(".modal");
     }, 3000);
   }
 }
 
-module.exports = forms;
+export default forms;

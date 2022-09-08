@@ -123,4 +123,4 @@ function calculator() {
   getInputInfo("#height");
 }
 
-module.exports = calculator;
+export default calculator;

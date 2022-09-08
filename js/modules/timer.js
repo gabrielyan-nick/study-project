@@ -1,7 +1,5 @@
-function timer() {
+function timer(timerSelector, deadline) {
   //timer
-
-  const deadline = "2022-9-29";
 
   function getTimeRemaining(endtime) {
     // определяем оставшееся время, результат в обьект
@@ -60,7 +58,7 @@ function timer() {
     }
   }
 
-  setClock(".timer", deadline);
+  setClock(timerSelector, deadline);
 }
 
-module.exports = timer;
+export default timer;
