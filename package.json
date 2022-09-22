@@ -12,16 +12,27 @@
   },
   "author": "",
   "license": "ISC",
+  "browserslist": [
+    "> 1%"
+  ],
   "bugs": {
     "url": "https://github.com/gabrielyan-nick/study-project/issues"
   },
   "homepage": "https://github.com/gabrielyan-nick/study-project#readme",
   "devDependencies": {
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.0",
+    "@babel/preset-env": "^7.19.0",
+    "babel-loader": "^8.2.5",
+    "core-js": "^3.25.1",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "axios": "^0.27.2",
-    "json-server": "^0.17.0"
+    "es6-promise": "^4.2.8",
+    "json-server": "^0.17.0",
+    "nodelist-foreach-polyfill": "^1.2.0"
   }
 }
